@@ -1,4 +1,4 @@
-# BloodBridge (my-project)
+# BloodBridge (blood-donorr)
 
 > **Smart Emergency Blood Donor Matching & Hospital Dispatch Platform**
 
@@ -30,8 +30,8 @@ BloodBridge is a mission-critical emergency blood donor matching platform design
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/my-project.git
-cd my-project
+git clone https://github.com/vnaveen0777-svg/blood-donorr.git
+cd blood-donorr
 ```
 
 ### 2. Run Locally
