@@ -61,10 +61,17 @@
     .fi:focus{border-color:rgba(244,63,94,.6);background:rgba(255,255,255,.09);box-shadow:0 0 0 3px rgba(220,38,38,.15)}
     .fi option{background:#1e293b;color:#fff}
 
-    .submit-btn{width:100%;padding:14px;border-radius:14px;font-size:13px;font-weight:800;color:#fff;margin-top:8px;background:linear-gradient(135deg,#dc2626 0%,#f43f5e 50%,#ea580c 100%);background-size:200% 200%;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 32px rgba(220,38,38,.4);transition:all .3s;animation:btnGlow 3s ease-in-out infinite alternate}
+    .submit-btn{width:100%;padding:14px;border-radius:14px;font-size:13px;font-weight:800;color:#fff;margin-top:8px;background:linear-gradient(135deg,#dc2626 0%,#f43f5e 50%,#ea580c 100%);background-size:200% 200%;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 32px rgba(220,38,38,.4);transition:all .3s;animation:btnGlow 3s ease-in-out infinite alternate;border:none;cursor:pointer}
     @keyframes btnGlow{0%{box-shadow:0 8px 32px rgba(220,38,38,.4);background-position:0% 50%}100%{box-shadow:0 8px 48px rgba(244,63,94,.65);background-position:100% 50%}}
-    .submit-btn:hover{transform:translateY(-2px);box-shadow:0 12px 42px rgba(220,38,38,.55)}
-    .submit-btn:active{transform:scale(.98)}
+    .submit-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 42px rgba(220,38,38,.55)}
+    .submit-btn:active:not(:disabled){transform:scale(.98)}
+    .submit-btn:disabled{opacity:.65;cursor:not-allowed;transform:none!important;box-shadow:none!important;animation:none!important}
+    .btn-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:btnSpin .7s linear infinite;display:inline-block;flex-shrink:0}
+    @keyframes btnSpin{to{transform:rotate(360deg)}}
+    .form-alert{padding:11px 14px;border-radius:12px;font-size:12px;font-weight:600;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px;line-height:1.45}
+    .form-alert.error{background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.4);color:#fca5a5}
+    .form-alert.success{background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.4);color:#6ee7b7}
+    .form-alert.info{background:rgba(59,130,246,.18);border:1px solid rgba(59,130,246,.4);color:#93c5fd}
     .privacy-note{margin-top:20px;text-align:center;font-size:11px;color:rgba(100,116,139,.8);display:flex;align-items:center;justify-content:center;gap:6px}
 
     /* APP */
@@ -391,6 +398,13 @@
       <div class="stat-pill stat-pill-b"><span class="spv">4.2m</span><span class="spl">Avg Response</span></div>
     </div>
 
+    <div style="display:flex;justify-content:center;margin-bottom:16px">
+      <button type="button" class="db-btn" onclick="openDbConfig()" title="Configure Supabase Database" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);color:#cbd5e1">
+        <span class="db-dot" id="loginDbDot"></span>
+        <span id="loginDbStatusText">Supabase Demo</span>
+      </button>
+    </div>
+
     <span class="role-lbl">Account Type</span>
     <div class="role-toggle">
       <button class="role-btn active" id="donorRoleBtn" onclick="setRole('donor')">
@@ -404,21 +418,22 @@
     </div>
 
     <form id="loginForm" onsubmit="handleLogin(event)">
+      <div id="loginAlert" class="form-alert" style="display:none"></div>
       <div class="form-row">
         <div>
-          <label class="fl">Full Name</label>
-          <input type="text" class="fi" required placeholder="e.g. Sarah Jenkins" value="Sarah Jenkins"/>
+          <label class="fl" for="loginName">Full Name</label>
+          <input type="text" class="fi" id="loginName" name="name" required placeholder="e.g. Alex Morgan"/>
         </div>
       </div>
       <div class="form-row-2">
         <div>
-          <label class="fl">Mobile Number</label>
-          <input type="tel" class="fi" required placeholder="+91 98450 11990" value="+91 98450 11990"/>
+          <label class="fl" for="loginPhone">Mobile Number</label>
+          <input type="tel" class="fi" id="loginPhone" name="phone" required placeholder="+91 98450 11990"/>
         </div>
         <div id="bgField">
-          <label class="fl">Blood Group</label>
-          <select class="fi" id="loginBG">
-            <option value="O-" selected>O- Blood Type</option>
+          <label class="fl" for="loginBG">Blood Group</label>
+          <select class="fi" id="loginBG" name="bloodGroup" required>
+            <option value="O-">O- Blood Type (Universal)</option>
             <option value="O+">O+ Blood Type</option>
             <option value="A-">A- Blood Type</option>
             <option value="A+">A+ Blood Type</option>
@@ -431,23 +446,23 @@
       </div>
       <div class="form-row-2">
         <div>
-          <label class="fl">Date of Birth (DOB)</label>
-          <input type="date" class="fi" required value="1998-05-14"/>
+          <label class="fl" for="loginDOB">Date of Birth (DOB)</label>
+          <input type="date" class="fi" id="loginDOB" name="dob" required/>
         </div>
         <div>
-          <label class="fl">Email Address</label>
-          <input type="email" class="fi" required placeholder="sarah.jenkins@bloodbridge.org" value="sarah.jenkins@bloodbridge.org"/>
+          <label class="fl" for="loginEmail">Email Address</label>
+          <input type="email" class="fi" id="loginEmail" name="email" required placeholder="name@example.com"/>
         </div>
       </div>
       <div class="form-row">
         <div>
-          <label class="fl">Residential Address / City Area</label>
-          <input type="text" class="fi" required placeholder="e.g. 14/B Indiranagar 2nd Stage, Metro City" value="14/B Indiranagar, 2nd Stage, Metro City"/>
+          <label class="fl" for="loginAddress">Residential Address / City Area</label>
+          <input type="text" class="fi" id="loginAddress" name="address" required placeholder="e.g. 14/B Indiranagar 2nd Stage, Metro City"/>
         </div>
       </div>
-      <button type="submit" class="submit-btn">
+      <button type="submit" class="submit-btn" id="loginSubmitBtn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-        Continue &amp; Enter BloodBridge
+        <span id="loginBtnText">Continue &amp; Enter BloodBridge</span>
       </button>
     </form>
     <div class="privacy-note">
@@ -486,6 +501,10 @@
         <button class="hnav-btn" id="nav-heatmap" onclick="switchTab('heatmap')">Regional Heatmap</button>
       </nav>
       <div class="hactions">
+        <button class="db-btn" onclick="openDbConfig()" title="Configure Supabase Database">
+          <span class="db-dot" id="dbDot"></span>
+          <span id="dbStatusText">Supabase Demo</span>
+        </button>
         <button class="ai-btn" onclick="openAI()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
           AI Assistant
@@ -831,9 +850,44 @@ const COMPAT={"O-":["O-"],"O+":["O-","O+"],"A-":["O-","A-"],"A+":["O-","O+","A-"
 function isCompat(req,donor){return(COMPAT[req]||[]).includes(donor)}
 function dist(a,b,c,d){var R=6371,dlat=(c-a)*Math.PI/180,dlng=(d-b)*Math.PI/180,x=Math.sin(dlat/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dlng/2)**2;return Math.round(2*R*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))*10)/10}
 
+function getCoordsForAddress(addr) {
+  var s = (addr || '').toLowerCase();
+  var centers = [
+    { k: 'indiranagar', lat: 12.9716, lng: 77.5946 },
+    { k: 'mg road', lat: 12.9780, lng: 77.6010 },
+    { k: 'richmond', lat: 12.9650, lng: 77.5850 },
+    { k: 'ulsoor', lat: 12.9820, lng: 77.6100 },
+    { k: 'halasuru', lat: 12.9820, lng: 77.6100 },
+    { k: 'koramangala', lat: 12.9350, lng: 77.6150 },
+    { k: 'malleshwaram', lat: 12.9900, lng: 77.5700 },
+    { k: 'jayanagar', lat: 12.9400, lng: 77.5800 },
+    { k: 'airport', lat: 12.9750, lng: 77.6400 },
+    { k: 'yeshwanthpur', lat: 13.0100, lng: 77.5550 },
+    { k: 'shanthi', lat: 12.9600, lng: 77.6050 },
+    { k: 'hsr', lat: 12.9200, lng: 77.6200 },
+    { k: 'jp nagar', lat: 12.9100, lng: 77.5850 },
+    { k: 'whitefield', lat: 12.9698, lng: 77.7499 }
+  ];
+  for (var i = 0; i < centers.length; i++) {
+    if (s.indexOf(centers[i].k) >= 0) {
+      return { lat: centers[i].lat, lng: centers[i].lng };
+    }
+  }
+  var hash = 0;
+  for (var j = 0; j < s.length; j++) hash = ((hash << 5) - hash) + s.charCodeAt(j);
+  var offLat = ((Math.abs(hash) % 100) - 50) * 0.0006;
+  var offLng = ((Math.abs(hash >> 3) % 100) - 50) * 0.0006;
+  return {
+    lat: Math.round((12.9716 + offLat) * 10000) / 10000,
+    lng: Math.round((77.5946 + offLng) * 10000) / 10000
+  };
+}
+
 // STATE
 var S={
   role:'donor',
+  currentDonorId: localStorage.getItem('BLOODBRIDGE_CURRENT_DONOR_ID') || null,
+  currentDonor: null,
   donors:JSON.parse(JSON.stringify(DEMO_DONORS)),
   requests:[
     {id:"R1",hospitalName:"St. Jude Metropolitan Trauma Center",hospitalLoc:{lat:12.973,lng:77.599},bloodGroup:"O-",component:"Red Blood Cells (RBC)",unitsNeeded:2,urgency:"Critical",status:"Cascade Stage 1",cascadeKm:5,notified:8,responses:4,confirmed:2,note:"Emergency polytrauma surgery in OT-3. Immediate RBC replacement needed."},
@@ -857,40 +911,62 @@ var S={
 var supabaseClient = null;
 var isSupabaseConnected = false;
 var realtimeSub = null;
+var lastDbError = '';
 
 function getSupabaseConfig() {
-  var url = localStorage.getItem('BLOODBRIDGE_SUPABASE_URL') || (window.ENV && window.ENV.VITE_SUPABASE_URL) || '';
-  var key = localStorage.getItem('BLOODBRIDGE_SUPABASE_ANON_KEY') || (window.ENV && window.ENV.VITE_SUPABASE_ANON_KEY) || '';
+  var defaultUrl = 'https://xartkwrjhfaxppnnngoy.supabase.co';
+  var defaultKey = 'sb_publishable_RuLzgxMlwSSq6SQRntQjRQ_gAvHR_ru';
+  var url = localStorage.getItem('BLOODBRIDGE_SUPABASE_URL') || (window.ENV && window.ENV.VITE_SUPABASE_URL) || defaultUrl;
+  var key = localStorage.getItem('BLOODBRIDGE_SUPABASE_ANON_KEY') || (window.ENV && window.ENV.VITE_SUPABASE_ANON_KEY) || defaultKey;
   return { url: url.trim(), key: key.trim() };
 }
 
 function setDbStatus(st, msg) {
   var btnTxt = document.getElementById('dbStatusText');
   var dot = document.getElementById('dbDot');
+  var lBtnTxt = document.getElementById('loginDbStatusText');
+  var lDot = document.getElementById('loginDbDot');
   var mStat = document.getElementById('dbModalStatus');
   var mDot = document.getElementById('dbModalDot');
   var mDet = document.getElementById('dbModalDetails');
   
   if (st === 'connected') {
     if (btnTxt) btnTxt.textContent = 'Supabase Connected';
+    if (lBtnTxt) lBtnTxt.textContent = 'Supabase Connected';
     if (dot) dot.className = 'db-dot connected';
+    if (lDot) lDot.className = 'db-dot connected';
     if (mStat) mStat.innerHTML = '<span class="db-dot connected"></span> Live PostgreSQL Connected';
     if (mDot) mDot.className = 'db-dot connected';
     if (mDet) mDet.innerHTML = 'Connected to <strong style="color:#0f172a">' + (getSupabaseConfig().url.split('//')[1] || 'Supabase') + '</strong>. All queries &amp; mutations are live!';
   } else if (st === 'connecting') {
     if (btnTxt) btnTxt.textContent = 'Connecting...';
+    if (lBtnTxt) lBtnTxt.textContent = 'Connecting...';
     if (dot) dot.className = 'db-dot connecting';
+    if (lDot) lDot.className = 'db-dot connecting';
     if (mStat) mStat.innerHTML = '<span class="db-dot connecting"></span> Connecting to database...';
     if (mDot) mDot.className = 'db-dot connecting';
   } else if (st === 'error') {
-    if (btnTxt) btnTxt.textContent = 'Connection Error';
+    var isSchemaErr = msg && (msg.indexOf('schema cache') >= 0 || msg.indexOf('Could not find the table') >= 0);
+    var label = isSchemaErr ? 'Schema Needed' : 'Connection Error';
+    if (btnTxt) btnTxt.textContent = label;
+    if (lBtnTxt) lBtnTxt.textContent = label;
     if (dot) dot.className = 'db-dot error';
-    if (mStat) mStat.innerHTML = '<span class="db-dot error"></span> Connection Failed';
+    if (lDot) lDot.className = 'db-dot error';
+    if (mStat) mStat.innerHTML = '<span class="db-dot error"></span> ' + (isSchemaErr ? 'SQL Tables Needed' : 'Connection Failed');
     if (mDot) mDot.className = 'db-dot error';
-    if (mDet) mDet.innerHTML = '<span style="color:#ef4444">Error: ' + (msg || 'Unable to reach Supabase project. Check URL/Key or schema.') + '</span>';
+    if (mDet) {
+      if (isSchemaErr) {
+        var projId = (getSupabaseConfig().url.split('//')[1] || '').split('.')[0] || 'xartkwrjhfaxppnnngoy';
+        mDet.innerHTML = '<span style="color:#ef4444;font-weight:700">Project connected, but database tables are not yet created!</span><br/>Please open the <a href="https://supabase.com/dashboard/project/' + projId + '/sql/new" target="_blank" style="color:#2563eb;text-decoration:underline;font-weight:700">Supabase SQL Editor</a> and run <code style="background:#e2e8f0;padding:2px 4px;border-radius:4px">supabase/schema.sql</code> and <code style="background:#e2e8f0;padding:2px 4px;border-radius:4px">supabase/seed.sql</code>.';
+      } else {
+        mDet.innerHTML = '<span style="color:#ef4444">Error: ' + (msg || 'Unable to reach Supabase project. Check URL/Key or schema.') + '</span>';
+      }
+    }
   } else {
     if (btnTxt) btnTxt.textContent = 'Supabase Demo';
+    if (lBtnTxt) lBtnTxt.textContent = 'Supabase Demo';
     if (dot) dot.className = 'db-dot';
+    if (lDot) lDot.className = 'db-dot';
     if (mStat) mStat.innerHTML = '<span class="db-dot"></span> Demo In-Memory Mode';
     if (mDot) mDot.className = 'db-dot';
     if (mDet) mDet.innerHTML = 'Running offline in-memory demo data. Enter Supabase URL and Anon Key above to connect live.';
@@ -974,7 +1050,8 @@ async function initSupabase() {
     return true;
   } catch (err) {
     console.warn('Supabase connection check failed:', err);
-    setDbStatus('error', err.message || 'Failed connecting to database');
+    lastDbError = err.message || 'Failed connecting to database';
+    setDbStatus('error', lastDbError);
     isSupabaseConnected = false;
     return false;
   }
@@ -1022,6 +1099,14 @@ async function loadDonorsFromDB() {
           badges: typeof d.badges === 'string' ? JSON.parse(d.badges) : (d.badges || [])
         };
       });
+      if (S.currentDonorId) {
+        var found = S.donors.find(function(x) { return x.id === S.currentDonorId; });
+        if (found) {
+          S.currentDonor = found;
+        } else if (S.currentDonor) {
+          S.donors.unshift(S.currentDonor);
+        }
+      }
       var dc = document.getElementById('dcount');
       if (dc) dc.textContent = S.donors.length + '+';
     }
@@ -1159,12 +1244,16 @@ function subscribeRealtime() {
 // DROPS ANIMATION
 function createDrops(){var c=document.getElementById('dropContainer'),cols=['#dc2626','#f43f5e','#ec4899','#f97316','#ef4444','#e11d48','#be123c'];for(var i=0;i<28;i++){var d=document.createElement('div');d.className='drop';var sz=Math.random()*14+6;d.style.cssText='width:'+sz+'px;height:'+(sz*1.4)+'px;left:'+(Math.random()*100)+'%;top:-20px;background:'+cols[Math.floor(Math.random()*cols.length)]+';animation-duration:'+(Math.random()*7+5)+'s;animation-delay:'+(Math.random()*10)+'s;opacity:0;';c.appendChild(d)}}
 
-// LOGIN
+// LOGIN & AUTH
 var selRole='donor';
-function setRole(r){selRole=r;document.getElementById('donorRoleBtn').classList.toggle('active',r==='donor');document.getElementById('hospitalRoleBtn').classList.toggle('active',r==='hospital');document.getElementById('bgField').style.display=r==='donor'?'':'none'}
-function handleLogin(e){
-  e.preventDefault();
-  S.role=selRole;
+function setRole(r){
+  selRole=r;
+  document.getElementById('donorRoleBtn').classList.toggle('active',r==='donor');
+  document.getElementById('hospitalRoleBtn').classList.toggle('active',r==='hospital');
+  document.getElementById('bgField').style.display=r==='donor'?'':'none';
+}
+
+function transitionToApp(goToDash){
   var lp=document.getElementById('login-page');
   lp.style.transition='all .4s ease';
   lp.style.opacity='0';
@@ -1178,11 +1267,235 @@ function handleLogin(e){
     setTimeout(function(){
       ap.style.opacity='1';
       initApp();
+      if (goToDash) {
+        switchTab('dashboard');
+      }
+      var submitBtn = document.getElementById('loginSubmitBtn');
+      if (submitBtn) submitBtn.disabled = false;
+      var btnText = document.getElementById('loginBtnText');
+      if (btnText) btnText.textContent = 'Continue & Enter BloodBridge';
     },30);
   },400);
 }
 
+async function handleLogin(e){
+  e.preventDefault();
+  var alertEl = document.getElementById('loginAlert');
+  var submitBtn = document.getElementById('loginSubmitBtn');
+  var btnText = document.getElementById('loginBtnText');
+
+  if (alertEl) {
+    alertEl.style.display = 'none';
+    alertEl.innerHTML = '';
+  }
+
+  if (selRole === 'hospital') {
+    S.role = 'hospital';
+    transitionToApp(false);
+    return;
+  }
+
+  // Donor Registration Mode
+  var nameEl = document.getElementById('loginName');
+  var phoneEl = document.getElementById('loginPhone');
+  var bgEl = document.getElementById('loginBG');
+  var dobEl = document.getElementById('loginDOB');
+  var emailEl = document.getElementById('loginEmail');
+  var addrEl = document.getElementById('loginAddress');
+
+  var name = nameEl ? nameEl.value.trim() : '';
+  var phone = phoneEl ? phoneEl.value.trim() : '';
+  var bg = bgEl ? bgEl.value : '';
+  var dob = dobEl ? dobEl.value : '';
+  var email = emailEl ? emailEl.value.trim() : '';
+  var addr = addrEl ? addrEl.value.trim() : '';
+
+  if (!name || !phone || !bg || !email || !addr) {
+    if (alertEl) {
+      alertEl.className = 'form-alert error';
+      alertEl.style.display = 'flex';
+      alertEl.innerHTML = '<span style="font-size:14px">⚠️</span> <span>Please fill in all required donor registration fields.</span>';
+    }
+    return;
+  }
+
+  // Loading state
+  if (submitBtn) submitBtn.disabled = true;
+  if (btnText) btnText.innerHTML = '<span class="btn-spinner"></span> Connecting &amp; Saving to Supabase...';
+
+  // Ensure Supabase connection
+  if (!supabaseClient || !isSupabaseConnected) {
+    var cfg = getSupabaseConfig();
+    if (!cfg.url || !cfg.key) {
+      if (alertEl) {
+        alertEl.className = 'form-alert error';
+        alertEl.style.display = 'flex';
+        alertEl.innerHTML = '<span style="font-size:14px">⚠️</span> <span><strong>Supabase Configuration Required:</strong> Please <a href="#" onclick="openDbConfig();return false;" style="color:#fff;text-decoration:underline;font-weight:800">configure your Supabase Project URL and Anon Key</a> to register live donors.</span>';
+      }
+      if (submitBtn) submitBtn.disabled = false;
+      if (btnText) btnText.textContent = 'Continue & Enter BloodBridge';
+      return;
+    }
+    var ok = await initSupabase();
+    if (!ok) {
+      var isSchema = lastDbError && (lastDbError.indexOf('schema cache') >= 0 || lastDbError.indexOf('Could not find the table') >= 0);
+      if (alertEl) {
+        alertEl.className = 'form-alert error';
+        alertEl.style.display = 'flex';
+        if (isSchema) {
+          alertEl.innerHTML = '<span style="font-size:14px">⚠️</span> <span><strong>Database Setup Needed:</strong> Connected to Supabase, but database tables do not exist yet. Please run <code style="background:rgba(255,255,255,.15);padding:1px 4px;border-radius:4px">supabase/schema.sql</code> in your <a href="https://supabase.com/dashboard/project/xartkwrjhfaxppnnngoy/sql/new" target="_blank" style="color:#fff;text-decoration:underline;font-weight:800">Supabase SQL Editor</a>.</span>';
+        } else {
+          alertEl.innerHTML = '<span style="font-size:14px">⚠️</span> <span><strong>Database Connection Failed:</strong> ' + (lastDbError || 'Unable to connect to Supabase. Check credentials or network.') + '</span>';
+        }
+      }
+      if (submitBtn) submitBtn.disabled = false;
+      if (btnText) btnText.textContent = 'Continue & Enter BloodBridge';
+      return;
+    }
+  }
+
+  try {
+    var coords = getCoordsForAddress(addr);
+    var donorId = 'd_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+    var donorPayload = {
+      id: donorId,
+      name: name,
+      phone: phone,
+      email: email,
+      blood_group: bg,
+      availability: 'Available for Emergency',
+      approx_area: addr,
+      lat: coords.lat,
+      lng: coords.lng,
+      last_donation_date: new Date(Date.now() - 65 * 86400000).toISOString().split('T')[0],
+      total_donations: 0,
+      emergency_responses: 0,
+      response_rate: 100,
+      avg_response_time_min: 5,
+      emergency_alerts_enabled: true,
+      is_verified: true,
+      is_medically_eligible: true,
+      badges: [
+        { title: bg === 'O-' ? "Universal LifeSaver" : "Verified LifeSaver", desc: bg === 'O-' ? "O- Universal donor ready for clinical emergency response" : "Registered BloodBridge Emergency LifeSaver", icon: bg === 'O-' ? "🌟" : "🩸" }
+      ]
+    };
+
+    if (btnText) btnText.innerHTML = '<span class="btn-spinner"></span> Inserting donor into Supabase...';
+
+    // 1. Insert into Supabase donors table
+    var insRes = await supabaseClient
+      .from('donors')
+      .insert([donorPayload]);
+
+    if (insRes.error) {
+      throw insRes.error;
+    }
+
+    if (btnText) btnText.innerHTML = '<span class="btn-spinner"></span> Loading registered donor from Supabase...';
+
+    // 2. Wait for successful response, then load the logged-in donor's data from Supabase
+    var fetchRes = await supabaseClient
+      .from('donors')
+      .select('*')
+      .eq('id', donorId)
+      .single();
+
+    if (fetchRes.error || !fetchRes.data) {
+      throw fetchRes.error || new Error('Failed to retrieve registered donor record from Supabase.');
+    }
+
+    var loaded = fetchRes.data;
+    var realDonor = {
+      id: loaded.id,
+      name: loaded.name,
+      phone: loaded.phone,
+      email: loaded.email,
+      bloodGroup: loaded.blood_group,
+      availability: loaded.availability,
+      location: { lat: loaded.lat, lng: loaded.lng, approxArea: loaded.approx_area },
+      lastDonationDate: loaded.last_donation_date,
+      totalDonations: loaded.total_donations || 0,
+      emergencyResponses: loaded.emergency_responses || 0,
+      responseRate: loaded.response_rate || 100,
+      avgResponseTimeMin: loaded.avg_response_time_min || 5,
+      emergencyAlertsEnabled: loaded.emergency_alerts_enabled !== false,
+      isVerified: loaded.is_verified !== false,
+      isMedicallyEligible: loaded.is_medically_eligible !== false,
+      badges: typeof loaded.badges === 'string' ? JSON.parse(loaded.badges) : (loaded.badges || [])
+    };
+
+    // Store in application state
+    S.role = 'donor';
+    S.currentDonor = realDonor;
+    S.currentDonorId = realDonor.id;
+    localStorage.setItem('BLOODBRIDGE_CURRENT_DONOR_ID', realDonor.id);
+
+    var existIdx = S.donors.findIndex(function(x){ return x.id === realDonor.id; });
+    if (existIdx >= 0) S.donors[existIdx] = realDonor;
+    else S.donors.unshift(realDonor);
+
+    // Create welcome notification for the newly registered donor
+    var welcomeNotif = {
+      id: 'n_' + Date.now(),
+      user_id: realDonor.id,
+      title: 'Emergency Donor Profile Verified (' + realDonor.bloodGroup + ')',
+      message: 'Welcome ' + realDonor.name + '! Your blood type (' + realDonor.bloodGroup + ') is verified and registered for emergency blood dispatch in ' + realDonor.location.approxArea + '.',
+      type: 'info',
+      dist_km: null,
+      is_read: false
+    };
+
+    try {
+      await supabaseClient.from('notifications').insert([welcomeNotif]);
+      S.notifications.unshift({
+        id: welcomeNotif.id,
+        userId: welcomeNotif.user_id,
+        title: welcomeNotif.title,
+        message: welcomeNotif.message,
+        type: welcomeNotif.type,
+        distKm: null,
+        ts: new Date().toISOString(),
+        isRead: false
+      });
+    } catch (ne) {
+      console.warn('Welcome notification error:', ne);
+    }
+
+    if (alertEl) {
+      alertEl.className = 'form-alert success';
+      alertEl.style.display = 'flex';
+      alertEl.innerHTML = '<span style="font-size:14px">✓</span> <span>Registered successfully in Supabase! Loading your dashboard...</span>';
+    }
+
+    setTimeout(function(){
+      transitionToApp(true);
+    }, 450);
+
+  } catch (err) {
+    console.error('Registration error:', err);
+    if (alertEl) {
+      alertEl.className = 'form-alert error';
+      alertEl.style.display = 'flex';
+      alertEl.innerHTML = '<span style="font-size:14px">⚠️</span> <span><strong>Registration Error:</strong> ' + (err.message || 'Database error occurred while saving donor details.') + '</span>';
+    }
+    if (submitBtn) submitBtn.disabled = false;
+    if (btnText) btnText.textContent = 'Continue & Enter BloodBridge';
+  }
+}
+
 function signOut(){
+  S.currentDonorId = null;
+  S.currentDonor = null;
+  localStorage.removeItem('BLOODBRIDGE_CURRENT_DONOR_ID');
+  var form = document.getElementById('loginForm');
+  if (form) form.reset();
+  var alertEl = document.getElementById('loginAlert');
+  if (alertEl) { alertEl.style.display = 'none'; alertEl.innerHTML = ''; }
+  var submitBtn = document.getElementById('loginSubmitBtn');
+  if (submitBtn) submitBtn.disabled = false;
+  var btnText = document.getElementById('loginBtnText');
+  if (btnText) btnText.textContent = 'Continue & Enter BloodBridge';
+
   var ap=document.getElementById('app-page');
   ap.style.transition='opacity .3s ease';
   ap.style.opacity='0';
@@ -1214,12 +1527,13 @@ function initApp(){
     if(heroActs)heroActs.style.display='flex';
     if(hs)hs.style.display='none';
   } else {
+    var actDonor = getActiveDonor();
     document.getElementById('roleBadge').textContent='Donor Portal';
     document.getElementById('roleBadge').className='hbadge hbadge-d';
     document.getElementById('nav-dashboard').textContent='My Donor Alerts & Availability';
     var mnd=document.getElementById('mn-dashboard');
     if(mnd)mnd.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Alerts';
-    document.getElementById('roleSub').textContent='Emergency LifeSaver Network';
+    document.getElementById('roleSub').textContent=actDonor ? ('Emergency LifeSaver Network · Active Donor: ' + actDonor.name) : 'Emergency LifeSaver Network';
     if(eb)eb.style.display='';
     if(heroActs)heroActs.style.display='none';
     if(hs)hs.style.display='';
@@ -1227,9 +1541,9 @@ function initApp(){
   renderHospitals();
   renderRequests();
   initReqBGGrid();
-  switchTab('home');
+  switchTab(S.currentTab || 'home');
   showHeatmapProf();
-  initSupabase();
+  if (!supabaseClient) initSupabase();
 }
 
 // TABS
@@ -1364,11 +1678,21 @@ function notifyD(id){
 }
 
 // DONOR DASH
+function getActiveDonor(){
+  var activeId = S.currentDonorId || (S.currentDonor && S.currentDonor.id);
+  if (activeId) {
+    var found = S.donors.find(function(x){ return x.id === activeId; });
+    if (found) return found;
+  }
+  return S.currentDonor || S.donors[0];
+}
+
 function renderDonorDash(el){
-  var d=S.donors.find(function(x){return x.id==='d1';})||S.donors[0];
-  var alerts=S.notifications.filter(function(n){return n.userId==='d1'||n.userId==='all';});
+  var d=getActiveDonor();
+  if(!d) return;
+  var alerts=S.notifications.filter(function(n){return n.userId===d.id||n.userId==='all';});
   var avOpts=[{lbl:'Available for Emergency',cls:'ag',dot:'#22c55e'},{lbl:'Available Today',cls:'aa',dot:'#f59e0b'},{lbl:'Available Later',cls:'ab',dot:'#3b82f6'},{lbl:'Unavailable',cls:'agy',dot:'#94a3b8'}];
-  el.innerHTML='<div class="dpcard"><div class="phd"><div style="display:flex;align-items:center;gap:16px"><div class="bavatar">'+d.bloodGroup+'</div><div><div style="display:flex;align-items:center;gap:8px"><h2 style="font-size:18px;font-weight:900;color:#0f172a">'+d.name+'</h2>'+(d.isVerified?'<span style="font-size:9px;font-weight:800;padding:3px 8px;border-radius:6px;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0">✓ Verified Donor</span>':'')+'</div><p style="font-size:11px;color:#64748b;margin-top:4px;display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>'+d.location.approxArea+' · Response Rate: <strong style="color:#059669">'+d.responseRate+'%</strong></p></div></div><button class="altgl '+(d.emergencyAlertsEnabled?'on':'off')+'" onclick="toggleAlerts(\'d1\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Emergency Alerts: '+(d.emergencyAlertsEnabled?'ACTIVE':'PAUSED')+'</button></div><div style="margin-top:20px;padding-top:20px;border-top:1px solid #f1f5f9"><p style="font-size:12px;font-weight:800;color:#334155;margin-bottom:12px;display:flex;align-items:center;gap:8px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Set Current Availability Status (1-Tap):</p><div class="avail-grid">'+avOpts.map(function(o){return '<button class="avbtn'+(d.availability===o.lbl?' '+o.cls:'')+'" onclick="setAvail(\'d1\',\''+o.lbl+'\')"><span class="avdot" style="background:'+o.dot+'"></span><span style="font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+o.lbl+'</span></button>';}).join('')+'</div></div></div><div class="ag2"><div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><h3 style="font-size:14px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Incoming Emergency Alerts</h3><span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca">'+alerts.filter(function(a){return!a.isRead;}).length+' Unread</span></div><div style="display:flex;flex-direction:column;gap:12px">'+renderAlerts(alerts)+'</div></div><div><div class="scard"><div class="stitle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Donation Eligibility Status</div><div style="padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0"><div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;margin-bottom:6px"><span style="color:#64748b">Whole Blood Recovery Window</span><span style="font-weight:800;color:#059669">Eligible Now</span></div><div class="ebar"><div class="efill" style="width:100%"></div></div><p style="font-size:10px;color:#94a3b8;margin-top:8px">Last recorded donation: '+new Date(d.lastDonationDate).toLocaleDateString()+'. (56+ days recovery fulfilled).</p></div><p style="font-size:10px;color:#94a3b8;font-style:italic;margin-top:10px">* Official medical fitness is screened on-site by clinical staff.</p></div><div class="scard"><div class="stitle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>Contribution Milestones</div><div class="mg"><div class="mbox"><span class="mval r">'+d.totalDonations+'</span><span class="mlbl">Lifetime Donations</span></div><div class="mbox"><span class="mval g">'+d.emergencyResponses+'</span><span class="mlbl">Emergency Assists</span></div></div>'+d.badges.map(function(b){return '<div class="badge-item"><span class="bico">'+b.icon+'</span><div><div class="bname">'+b.title+'</div><div class="bdesc">'+b.desc+'</div></div></div>';}).join('')+'</div></div></div>';
+  el.innerHTML='<div class="dpcard"><div class="phd"><div style="display:flex;align-items:center;gap:16px"><div class="bavatar">'+d.bloodGroup+'</div><div><div style="display:flex;align-items:center;gap:8px"><h2 style="font-size:18px;font-weight:900;color:#0f172a">'+d.name+'</h2>'+(d.isVerified?'<span style="font-size:9px;font-weight:800;padding:3px 8px;border-radius:6px;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0">✓ Verified Donor</span>':'')+'</div><p style="font-size:11px;color:#64748b;margin-top:4px;display:flex;align-items:center;gap:8px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>'+d.location.approxArea+' · Response Rate: <strong style="color:#059669">'+d.responseRate+'%</strong></p></div></div><button class="altgl '+(d.emergencyAlertsEnabled?'on':'off')+'" onclick="toggleAlerts(\''+d.id+'\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Emergency Alerts: '+(d.emergencyAlertsEnabled?'ACTIVE':'PAUSED')+'</button></div><div style="margin-top:20px;padding-top:20px;border-top:1px solid #f1f5f9"><p style="font-size:12px;font-weight:800;color:#334155;margin-bottom:12px;display:flex;align-items:center;gap:8px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Set Current Availability Status (1-Tap):</p><div class="avail-grid">'+avOpts.map(function(o){return '<button class="avbtn'+(d.availability===o.lbl?' '+o.cls:'')+'" onclick="setAvail(\''+d.id+'\',\''+o.lbl+'\')"><span class="avdot" style="background:'+o.dot+'"></span><span style="font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+o.lbl+'</span></button>';}).join('')+'</div></div></div><div class="ag2"><div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><h3 style="font-size:14px;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Incoming Emergency Alerts</h3><span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:#fef2f2;color:#dc2626;border:1px solid #fecaca">'+alerts.filter(function(a){return!a.isRead;}).length+' Unread</span></div><div style="display:flex;flex-direction:column;gap:12px">'+renderAlerts(alerts)+'</div></div><div><div class="scard"><div class="stitle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Donation Eligibility Status</div><div style="padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0"><div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;margin-bottom:6px"><span style="color:#64748b">Whole Blood Recovery Window</span><span style="font-weight:800;color:#059669">Eligible Now</span></div><div class="ebar"><div class="efill" style="width:100%"></div></div><p style="font-size:10px;color:#94a3b8;margin-top:8px">Last recorded donation: '+new Date(d.lastDonationDate).toLocaleDateString()+'. (56+ days recovery fulfilled).</p></div><p style="font-size:10px;color:#94a3b8;font-style:italic;margin-top:10px">* Official medical fitness is screened on-site by clinical staff.</p></div><div class="scard"><div class="stitle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>Contribution Milestones</div><div class="mg"><div class="mbox"><span class="mval r">'+d.totalDonations+'</span><span class="mlbl">Lifetime Donations</span></div><div class="mbox"><span class="mval g">'+d.emergencyResponses+'</span><span class="mlbl">Emergency Assists</span></div></div>'+(d.badges||[]).map(function(b){return '<div class="badge-item"><span class="bico">'+b.icon+'</span><div><div class="bname">'+b.title+'</div><div class="bdesc">'+b.desc+'</div></div></div>';}).join('')+'</div></div></div>';
 }
 
 function renderAlerts(alerts){
@@ -1394,9 +1718,10 @@ async function respondAlert(id,action){
       }).eq('id', id);
       
       if(notif && notif.reqId){
+        var actDonor = getActiveDonor();
         await supabaseClient.from('request_responses').upsert({
           request_id: notif.reqId,
-          donor_id: 'd1',
+          donor_id: actDonor ? actDonor.id : 'd1',
           action: action
         }, { onConflict: 'request_id,donor_id' });
       }
@@ -1524,7 +1849,7 @@ async function createReq(){
   
   var newNotif = {
     id: notifId,
-    user_id: 'd1',
+    user_id: 'all',
     request_id: reqId,
     title: '🚨 EMERGENCY ALERT: '+reqBG+' Needed',
     message: 'St. Jude Trauma Center has initiated an emergency request for '+units+' units of '+comp+'. Distance approx 3.2 km.',
@@ -1582,7 +1907,8 @@ function showHeatmapProf(){
   var p=document.getElementById('hmProf');
   if(!p)return;
   if(S.role!=='donor'){p.style.display='none';return;}
-  var d=S.donors.find(function(x){return x.id==='d1';})||S.donors[0];
+  var d=getActiveDonor();
+  if(!d){p.style.display='none';return;}
   if(document.getElementById('hmProfAv'))document.getElementById('hmProfAv').textContent=d.bloodGroup;
   if(document.getElementById('hmProfName'))document.getElementById('hmProfName').textContent=d.name;
   if(document.getElementById('hmProfLoc'))document.getElementById('hmProfLoc').textContent=d.location.approxArea;
